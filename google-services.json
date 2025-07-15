@@ -12,7 +12,12 @@
           "package_name": "com.example.app_mineria"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "301905941765-f5ru5c5vl90g1h933e8qun6p0dfdrpb1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBXxQiR5AvSw9hQCCUmx9eSCFisPYH-_Ko"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "301905941765-f5ru5c5vl90g1h933e8qun6p0dfdrpb1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "301905941765-6ek2q13lv67oojrb9hdlhpvecuku9hg4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.appMineria.RunnerTests"
+              }
+            }
+          ]
         }
       }
     },
@@ -31,7 +48,12 @@
           "package_name": "com.kuntur"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "301905941765-f5ru5c5vl90g1h933e8qun6p0dfdrpb1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBXxQiR5AvSw9hQCCUmx9eSCFisPYH-_Ko"
@@ -39,7 +61,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "301905941765-f5ru5c5vl90g1h933e8qun6p0dfdrpb1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "301905941765-6ek2q13lv67oojrb9hdlhpvecuku9hg4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.appMineria.RunnerTests"
+              }
+            }
+          ]
         }
       }
     }

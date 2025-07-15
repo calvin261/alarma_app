@@ -1,14 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, SafeAreaView, ActivityIndicator, Modal, Alert } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-// @ts-ignore: Camera type is not exported, use any for ref
-import { uploadFile } from '../services/storageService';
-import { addIncident } from '../services/firestoreService';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, theme } from '../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { getApp } from '@react-native-firebase/app';
+import { getStorage, ref as storageRef, getDownloadURL } from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
 
 // Define el tipo de rutas principales
 export type RootStackParamList = {
@@ -20,7 +22,9 @@ export type RootStackParamList = {
     Mapa: undefined;
     Historial: undefined;
     Vigilancia: undefined;
+    Camaras: undefined;
     Welcome: undefined;
+    UsersMap: undefined;
 };
 
 declare global {
@@ -32,6 +36,8 @@ declare global {
 
 
 export default function HomeScreen() {
+    const [lastAlertTime, setLastAlertTime] = useState<string | null>(null);
+    const [incidentsCount, setIncidentsCount] = useState<number>(0);
 
     const navigation = useNavigation();
     const [isOn, setIsOn] = useState(false);
@@ -41,6 +47,8 @@ export default function HomeScreen() {
     const [loadingLocation, setLoadingLocation] = useState(true);
     const [locationError, setLocationError] = useState<string | null>(null);
     const [photo, setPhoto] = useState<string | null>(null);
+    const [showPhotoModal, setShowPhotoModal] = useState(false);
+    const [photoTimestamp, setPhotoTimestamp] = useState<number | null>(null);
     const [permission, requestPermission] = useCameraPermissions();
     const handleToggle = async () => {
         if (!isOn) {
@@ -57,34 +65,12 @@ export default function HomeScreen() {
         }
     };
 
-    const handleTakePicture = async () => {
-        if (cameraRef.current) {
-            const result = await cameraRef.current.takePictureAsync();
-            setPhoto(result.uri);
-            setShowCamera(false);
-            setIsOn(true);
-            try {
-                // Subir la foto a Firebase Storage
-                const fileName = `photo_${Date.now()}.jpg`;
-                const downloadURL = await uploadFile(result.uri, fileName);
-                // Guardar metadata en Firestore
-                await addIncident({
-                    imageUrl: downloadURL,
-                    date: new Date(),
-                    location: location || '',
-                });
-            } catch (e) {
-                Alert.alert('Error', 'No se pudo guardar la foto en el historial.');
-            }
-        }
-    };
-
-    const handleCloseCamera = () => {
-        setShowCamera(false);
-    };
-
+    const [pendingPhoto, setPendingPhoto] = useState<string | null>(null);
+    const [pendingTimestamp, setPendingTimestamp] = useState<number | null>(null);
+    const [uploading, setUploading] = useState(false);
+    // Obtener ubicación de forma asíncrona
     useEffect(() => {
-        (async () => {
+        const fetchLocation = async () => {
             setLoadingLocation(true);
             setLocationError(null);
             try {
@@ -109,23 +95,95 @@ export default function HomeScreen() {
                 setLocationError('No se pudo obtener la ubicación');
             }
             setLoadingLocation(false);
-        })();
+        };
+        fetchLocation();
     }, []);
+
+    // Obtener estadísticas del historial de forma asíncrona
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const db = firestore();
+                // Obtener última alerta
+                const snap = await db.collection('historial')
+                    .orderBy('timestamp', 'desc')
+                    .limit(1)
+                    .get();
+                if (!snap.empty) {
+                    const ts = snap.docs[0].data().timestamp;
+                    setLastAlertTime(new Date(ts).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }));
+                } else {
+                    setLastAlertTime(null);
+                }
+                // Contar incidencias
+                const allSnap = await db.collection('historial').get();
+                setIncidentsCount(allSnap.size);
+            } catch (_e) {
+                setLastAlertTime(null);
+                setIncidentsCount(0);
+            }
+        };
+        fetchStats();
+    }, []);
+    const handleTakePicture = async () => {
+        if (cameraRef.current) {
+            const result = await cameraRef.current.takePictureAsync();
+            setPendingPhoto(result.uri);
+            setPendingTimestamp(Date.now());
+            setShowCamera(false);
+            setIsOn(true);
+            setShowPhotoModal(true);
+        }
+    };
+
+    const handleNotifyUPC = async () => {
+        if (pendingPhoto) {
+            setUploading(true);
+            setPhoto(pendingPhoto);
+            setPhotoTimestamp(pendingTimestamp);
+            try {
+                // Modular Firebase v22+ API
+                const app = getApp();
+                const storage = getStorage(app);
+                const db = firestore();
+                const fileName = `photo_${Date.now()}.jpg`;
+                const fileRef = storageRef(storage, fileName);
+                await fileRef.putFile(pendingPhoto);
+                const url = await getDownloadURL(fileRef);
+                await db.collection('historial').add({
+                    url,
+                    timestamp: Date.now(),
+                    location,
+                });
+                Alert.alert('Foto guardada', 'La foto se ha guardado en el historial correctamente.');
+            } catch (e) {
+                console.error(e);
+                Alert.alert('Error', 'No se pudo guardar la foto en el historial.');
+            }
+            setUploading(false);
+        }
+        setShowPhotoModal(false);
+        setIsOn(false);
+        setPendingPhoto(null);
+        setPendingTimestamp(null);
+    };
+
+    const handleCancelPhoto = () => {
+        setShowPhotoModal(false);
+        setIsOn(false);
+        setPendingPhoto(null);
+        setPendingTimestamp(null);
+    };
+
+    const handleCloseCamera = () => {
+        setShowCamera(false);
+    };
 
     return (
         <LinearGradient colors={[colors.primary, colors.secondary]} style={styles.gradient}>
             <SafeAreaView style={{ flex: 1, paddingBottom: 70 }}>
-                <View style={styles.header}>
-                    <Icon name="shield-check" size={32} color={colors.icon} style={{ marginRight: 8 }} />
-                    <View>
-                        <Text style={styles.logo}>KUNTUR</Text>
-                        <Text style={styles.slogan}>Seguridad desde las nubes</Text>
-                    </View>
-                    <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                        {/* Opcional: icono de configuración u otro contenido */}
-                    </View>
-                </View>
-                <View style={[styles.location, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}> 
+                <Header />
+                <View style={[styles.location, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}>
                     <Icon name="map-marker" size={18} color={colors.accent} style={{ marginRight: 6 }} />
                     {loadingLocation ? (
                         <ActivityIndicator size="small" color={colors.accent} />
@@ -137,25 +195,24 @@ export default function HomeScreen() {
                         <Text style={{ textAlign: 'center' }}>Ubicación desconocida</Text>
                     )}
                 </View>
-              <View style={styles.cardMain}>
-                  <View style={[styles.circleIcon, isOn ? styles.circleIconOn : styles.circleIconOff]}>
-                    <Icon
-                        name={isOn ? "power" : "power-off"}
-                        size={54}
-                        color={isOn ? colors.accent : colors.danger}
-                    />
+                <View style={styles.cardMain}>
+                    <View style={[styles.circleIcon, isOn ? styles.circleIconOn : styles.circleIconOff]}>
+                        <Image
+                            source={isOn ? require('../assets/power_on_icon.png') : require('../assets/power_off_icon.png')}
+                            style={{ width: 54, height: 54 }}
+                        />
+                    </View>
+                    <Text style={styles.cardMainTitle}>{'Kuntur'}</Text>
+                    <Text style={styles.cardMainSubtitle}>{'Apagado'}</Text>
+                    <TouchableOpacity
+                        style={[styles.buttonMain, isOn ? styles.buttonMainOn : styles.buttonMainOff]}
+                        onPress={handleToggle}
+                    >
+                        <Text style={[styles.buttonMainText, isOn ? styles.buttonMainTextOn : styles.buttonMainTextOff]}>
+                            {isOn ? "Encendido" : "Apagado"}
+                        </Text>
+                    </TouchableOpacity>
                 </View>
-                <Text style={styles.cardMainTitle}>{'Kuntur'}</Text>
-                <Text style={styles.cardMainSubtitle}>{'a la Escucha'}</Text>
-                <TouchableOpacity
-                    style={[styles.buttonMain, isOn ? styles.buttonMainOn : styles.buttonMainOff]}
-                    onPress={handleToggle}
-                >
-                    <Text style={[styles.buttonMainText, isOn ? styles.buttonMainTextOn : styles.buttonMainTextOff]}>
-                        {isOn ? "Encendido" : "Apagado"}
-                    </Text>
-                </TouchableOpacity>
-              </View>
 
                 <Modal visible={showCamera} animationType="slide">
                     <View style={{ flex: 1, backgroundColor: '#000' }}>
@@ -178,36 +235,57 @@ export default function HomeScreen() {
                         </CameraView>
                     </View>
                 </Modal>
+
+                {/* Modal para mostrar la foto tomada y datos con dos botones */}
+                <Modal visible={showPhotoModal} animationType="slide" transparent>
+                    <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+                        <View style={{ backgroundColor: colors.card, borderRadius: 18, padding: 18, alignItems: 'center', width: '100%', maxWidth: 350 }}>
+                            {pendingPhoto && (
+                                <Image source={{ uri: pendingPhoto }} style={{ width: 280, height: 180, borderRadius: 12, marginBottom: 18 }} resizeMode="cover" />
+                            )}
+                            <Text style={{ color: colors.text, fontSize: 16, marginBottom: 8, textAlign: 'center' }}>
+                                {location ? location : 'Ubicación desconocida'}
+                            </Text>
+                            <Text style={{ color: colors.subtitle, fontSize: 15, marginBottom: 18 }}>
+                                {pendingTimestamp ? new Date(pendingTimestamp).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : ''}
+                            </Text>
+                            {uploading ? (
+                                <View style={{ alignItems: 'center', marginVertical: 16 }}>
+                                    <ActivityIndicator size="large" color={colors.accent} />
+                                    <Text style={{ color: colors.accent, marginTop: 8, fontWeight: 'bold' }}>Enviando información a servidores...</Text>
+                                </View>
+                            ) : (
+                                <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between', marginTop: 8 }}>
+                                    <TouchableOpacity
+                                        style={{ backgroundColor: colors.danger, borderRadius: 12, paddingVertical: 16, paddingHorizontal: 24, flex: 1, marginRight: 8 }}
+                                        onPress={handleCancelPhoto}
+                                    >
+                                        <Text style={{ color: colors.text, fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>Cancelar</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={{ backgroundColor: colors.accent, borderRadius: 12, paddingVertical: 16, paddingHorizontal: 24, flex: 1, marginLeft: 8 }}
+                                        onPress={handleNotifyUPC}
+                                    >
+                                        <Text style={{ color: colors.text, fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>Notifica UPC</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            )}
+                        </View>
+                    </View>
+                </Modal>
                 <View style={styles.rowCards}>
                     <View style={styles.cardSmall}>
                         <Icon name="headphones" size={32} color={colors.icon} style={{ marginBottom: 6 }} />
                         <Text style={styles.cardSmallLabel}>Última Alerta</Text>
-                        <Text style={styles.cardSmallValue}>21:39</Text>
+                        <Text style={styles.cardSmallValue}>{lastAlertTime ? lastAlertTime : '--:--'}</Text>
                     </View>
                     <View style={styles.cardSmall}>
                         <Icon name="chart-bar" size={32} color={colors.icon} style={{ marginBottom: 6 }} />
                         <Text style={styles.cardSmallLabel}>Tipos de Incidencias</Text>
-                        <Text style={styles.cardSmallValue}>20</Text>
+                        <Text style={styles.cardSmallValue}>{incidentsCount}</Text>
                     </View>
                 </View>
-                <View style={styles.tabBar}>
-                    <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('Historial')}>
-                        <Icon name="history" size={24} color={colors.icon} />
-                        <Text style={styles.tabLabel}>Historial</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.tabItem, styles.tabItemActive]}>
-                        <Icon name="microphone" size={24} color={colors.accent} />
-                        <Text style={[styles.tabLabel, { color: colors.accent }]}>Monitorear</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.tabItem}>
-                        <Icon name="account-group" size={24} color={colors.icon} />
-                        <Text style={styles.tabLabel}>Contactos</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.tabItem}>
-                        <Icon name="map-search" size={24} color={colors.icon} />
-                        <Text style={styles.tabLabel}>Encontrar</Text>
-                    </TouchableOpacity>
-                </View>
+                <Footer />
             </SafeAreaView>
         </LinearGradient>
     );
@@ -220,9 +298,28 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
         marginTop: 50,
-        marginBottom: 60,
+        marginBottom: 30,
         paddingHorizontal: 18,
+    },
+    headerIcon: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        marginHorizontal: 10,
+    },
+    headerLatters: {
+        width: 180,
+        height: 80,
+        resizeMode: 'contain',
+        marginHorizontal: 10,
+        marginTop: 10,
+    },
+    headerCenter: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     logo: {
         color: colors.text,

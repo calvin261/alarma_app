@@ -8,7 +8,7 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/logo_face.svg",
+      "image": "./assets/logo_face.png",
       "resizeMode": "contain",
       "backgroundColor": "#FFFFFF"
     },
@@ -17,7 +17,13 @@
     },
     "android": {
       "googleServicesFile": "./google-services.json",
+      "jsEngine": "hermes",
       "package": "com.kuntur",
+      "permissions": [
+        "CAMERA",
+        "LOCATION",
+        "STORAGE"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -27,6 +33,11 @@
     "plugins": [
       "@react-native-firebase/app",
       "@react-native-firebase/auth",
+      ["react-native-maps", {
+        "config": {
+          "androidGoogleMapsApiKey": "AIzaSyCHXp9WpKJd21oah-1gZhqhhmEaNnwfBNo"
+        }
+      }],
       [
         "expo-build-properties",
         {
@@ -38,6 +49,11 @@
     ],
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4aba577a-8d1f-4405-adcf-4c954daa05a2"
+      }
     }
   }
 }

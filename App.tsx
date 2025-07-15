@@ -5,11 +5,14 @@ import HomeScreen from './screens/HomeScreen';
 import UploadScreen from './screens/UploadScreen';
 import MapScreen from './screens/MapScreen';
 import HistoryScreen from './screens/HistoryScreen';
+import HistorialDetalleScreen from './screens/HistorialDetalleScreen';
 import SurveillanceScreen from './screens/SurveillanceScreen';
 import SplashScreen from './screens/SplashScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
+import CamarasScreen from './screens/CamarasScreen';
+import UsersMapScreen from './screens/UsersMapScreen';
 import { colors } from './theme';
 
 const Stack = createStackNavigator();
@@ -47,9 +50,12 @@ export default function App() {
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="CargarVideo" component={UploadScreen} />
-        <Stack.Screen name="Mapa" component={MapScreen} />
+      
         <Stack.Screen name="Historial" component={HistoryScreen} />
+        <Stack.Screen name="HistorialDetalle" component={HistorialDetalleScreen} />
         <Stack.Screen name="Vigilancia" component={SurveillanceScreen} />
+        <Stack.Screen name="Camaras" component={CamarasScreen} />
+        <Stack.Screen name="UsersMap" component={UsersMapScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
