@@ -1,15 +1,19 @@
 import React from 'react';
-import { View, Image, StyleSheet } from 'react-native';
-import { colors, theme } from '../theme';
+import { View, Image, StyleSheet, TouchableOpacity } from 'react-native';
+
+import { useNavigation } from '@react-navigation/native';
 
 export default function Header() {
+  const navigation = useNavigation();
   return (
     <View style={styles.header}>
       <Image source={require('../assets/face.png')} style={styles.headerIcon} />
       <View style={styles.headerCenter}>
         <Image source={require('../assets/latters.png')} style={styles.headerLatters} />
       </View>
-      <Image source={require('../assets/chip_set.png')} style={styles.headerIcon} />
+      <TouchableOpacity onPress={() => navigation.navigate('Welcome')}>
+        <Image source={require('../assets/chip_set.png')} style={styles.headerIcon} />
+      </TouchableOpacity>
     </View>
   );
 }

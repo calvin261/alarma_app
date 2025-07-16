@@ -10,8 +10,8 @@ export default function WelcomeScreen() {
   return (
     <LinearGradient colors={[colors.primary, colors.secondary]} style={styles.gradient}>
       <View style={styles.container}>
-        <Image source={require('../assets/splash-icon.png')} style={styles.logo} resizeMode="contain" />
-        <Text style={styles.brand}>KUNTUR</Text>
+        <Image source={require('../assets/face_complete.png')} style={styles.logo} resizeMode="contain" />
+      
         <Text style={styles.welcome}>Welcome Back</Text>
         <TouchableOpacity style={styles.buttonOutline} onPress={() => navigation.navigate('Login')}>
           <Text style={styles.buttonOutlineText}>Iniciar Sesión</Text>

@@ -20,10 +20,7 @@ export default function Footer() {
         <Icon name="camera-wireless-outline" size={24} color={colors.icon} />
         <Text style={styles.tabLabel}>Camaras</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('UsersMap')}>
-        <Icon name="google-maps" size={24} color={colors.icon} />
-        <Text style={styles.tabLabel}>Encontrar</Text>
-      </TouchableOpacity>
+  
     </View>
   );
 }

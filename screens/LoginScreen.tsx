@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, theme } from '../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -15,7 +15,7 @@ export default function LoginScreen() {
     <LinearGradient colors={[colors.primary, colors.secondary]} style={styles.gradient}>
       <View style={styles.container}>
         <View style={styles.logoBox}>
-          <Icon name="shield-check" size={64} color={colors.text} style={{marginBottom: 8}} />
+          <Image source={require('../assets/face.png')}  />
           <Text style={styles.brand}>KUNTUR</Text>
         </View>
         <View style={styles.formCard}>

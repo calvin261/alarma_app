@@ -16,6 +16,8 @@ type Incident = {
   location: string;
   lat?: number;
   lng?: number;
+  aiAnalysis?: string;
+  incidentType?: string;
 };
 
 const PAGE_SIZE = 10;
@@ -92,6 +94,12 @@ const HistoryScreen = () => {
         <View style={{ flex: 1 }}>
           <Text style={styles.itemTitle}>{item.location}</Text>
           <Text style={styles.itemSubtitle}>{new Date(item.timestamp).toLocaleString('es-ES')}</Text>
+          {item.aiAnalysis && (
+            <View style={styles.incidentTypeContainer}>
+              <Icon name="robot" size={16} color={colors.danger} style={{ marginRight: 4 }} />
+              <Text style={styles.incidentType}>{item.aiAnalysis}</Text>
+            </View>
+          )}
         </View>
         <Icon name="chevron-right" size={28} color={colors.icon} />
       </View>
@@ -201,6 +209,21 @@ const styles = StyleSheet.create({
   iconContainer: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.accent + '22', alignItems: 'center', justifyContent: 'center', marginRight: 14 },
   itemTitle: { fontSize: 16, fontWeight: 'bold', color: colors.text, marginBottom: 2 },
   itemSubtitle: { fontSize: 13, color: colors.subtitle },
+  incidentTypeContainer: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginTop: 4,
+    backgroundColor: colors.danger + '20',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    alignSelf: 'flex-start'
+  },
+  incidentType: { 
+    fontSize: 12, 
+    color: colors.danger, 
+    fontWeight: 'bold' 
+  },
   tabBar: {
     position: 'absolute',
     left: 0,

@@ -11,6 +11,7 @@ import { getStorage, ref as storageRef, getDownloadURL } from '@react-native-fir
 import firestore from '@react-native-firebase/firestore';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
+import * as Notifications from 'expo-notifications';
 
 // Define el tipo de rutas principales
 export type RootStackParamList = {
@@ -33,6 +34,16 @@ declare global {
     }
 }
 
+// Configurar el handler de notificaciones
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+    }),
+});
+
 
 
 export default function HomeScreen() {
@@ -50,6 +61,40 @@ export default function HomeScreen() {
     const [showPhotoModal, setShowPhotoModal] = useState(false);
     const [photoTimestamp, setPhotoTimestamp] = useState<number | null>(null);
     const [permission, requestPermission] = useCameraPermissions();
+    
+    // Función para solicitar permisos de notificaciones
+    const requestNotificationPermissions = async () => {
+        const { status } = await Notifications.requestPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert('Permisos requeridos', 'Se necesitan permisos de notificación para alertarte sobre incidentes.');
+            return false;
+        }
+        return true;
+    };
+
+    // Función para enviar notificación local
+    const sendLocalNotification = async (incidentType: string) => {
+        try {
+            const hasPermission = await requestNotificationPermissions();
+            if (!hasPermission) return;
+
+            await Notifications.scheduleNotificationAsync({
+                content: {
+                    title: '🚨 Incidente Reportado',
+                    body: `Se ha detectado: ${incidentType}. Las autoridades han sido notificadas.`,
+                    sound: true,
+                    data: {
+                        incidentType,
+                        location,
+                        timestamp: Date.now(),
+                    },
+                },
+                trigger: null, // Notificación inmediata
+            });
+        } catch (error) {
+            console.error('Error enviando notificación local:', error);
+        }
+    };
     const handleToggle = async () => {
         if (!isOn) {
             if (!permission || !permission.granted) {
@@ -68,6 +113,22 @@ export default function HomeScreen() {
     const [pendingPhoto, setPendingPhoto] = useState<string | null>(null);
     const [pendingTimestamp, setPendingTimestamp] = useState<number | null>(null);
     const [uploading, setUploading] = useState(false);
+    const [analyzing, setAnalyzing] = useState(false);
+    const [aiResult, setAiResult] = useState<string | null>(null);
+
+    // Array de respuestas simuladas de IA
+    const aiResponses = [
+        'Robo detectado',
+        'Asalto identificado',
+        'Secuestro en progreso',
+        'Vandalismo detectado',
+        'Actividad sospechosa',
+        'Pelea callejera',
+        'Accidente vehicular',
+        'Disturbios públicos',
+        'Intrusión detectada',
+        'Amenaza identificada'
+    ];
     // Obtener ubicación de forma asíncrona
     useEffect(() => {
         const fetchLocation = async () => {
@@ -98,6 +159,19 @@ export default function HomeScreen() {
         };
         fetchLocation();
     }, []);
+
+    // Manejar respuesta a notificaciones
+    useEffect(() => {
+        const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+            const data = response.notification.request.content.data;
+            if (data?.incidentType) {
+                // Navegar al historial cuando el usuario toque la notificación
+                navigation.navigate('Historial' as never);
+            }
+        });
+
+        return () => subscription.remove();
+    }, [navigation]);
 
     // Obtener estadísticas del historial de forma asíncrona
     useEffect(() => {
@@ -133,11 +207,21 @@ export default function HomeScreen() {
             setShowCamera(false);
             setIsOn(true);
             setShowPhotoModal(true);
+            setAnalyzing(true);
+            setAiResult(null);
+
+            // Simular análisis de IA con loading de 1.3 segundos
+            setTimeout(() => {
+                const randomIndex = Math.floor(Math.random() * aiResponses.length);
+                const selectedResponse = aiResponses[randomIndex];
+                setAiResult(selectedResponse);
+                setAnalyzing(false);
+            }, 1300);
         }
     };
 
     const handleNotifyUPC = async () => {
-        if (pendingPhoto) {
+        if (pendingPhoto && aiResult) {
             setUploading(true);
             setPhoto(pendingPhoto);
             setPhotoTimestamp(pendingTimestamp);
@@ -154,11 +238,17 @@ export default function HomeScreen() {
                     url,
                     timestamp: Date.now(),
                     location,
+                    aiAnalysis: aiResult,
+                    incidentType: aiResult
                 });
-                Alert.alert('Foto guardada', 'La foto se ha guardado en el historial correctamente.');
+                
+                // Enviar notificación local
+                await sendLocalNotification(aiResult);
+                
+                Alert.alert('Incidente reportado', `Se ha detectado: ${aiResult}. La información ha sido guardada en el historial y las autoridades han sido notificadas.`);
             } catch (e) {
                 console.error(e);
-                Alert.alert('Error', 'No se pudo guardar la foto en el historial.');
+                Alert.alert('Error', 'No se pudo guardar la información en el historial.');
             }
             setUploading(false);
         }
@@ -166,6 +256,8 @@ export default function HomeScreen() {
         setIsOn(false);
         setPendingPhoto(null);
         setPendingTimestamp(null);
+        setAiResult(null);
+        setAnalyzing(false);
     };
 
     const handleCancelPhoto = () => {
@@ -173,6 +265,8 @@ export default function HomeScreen() {
         setIsOn(false);
         setPendingPhoto(null);
         setPendingTimestamp(null);
+        setAiResult(null);
+        setAnalyzing(false);
     };
 
     const handleCloseCamera = () => {
@@ -249,6 +343,29 @@ export default function HomeScreen() {
                             <Text style={{ color: colors.subtitle, fontSize: 15, marginBottom: 18 }}>
                                 {pendingTimestamp ? new Date(pendingTimestamp).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : ''}
                             </Text>
+                            
+                            {/* Análisis de IA */}
+                            <View style={{ backgroundColor: colors.primary + '20', borderRadius: 12, padding: 16, marginBottom: 18, width: '100%' }}>
+                                <Text style={{ color: colors.text, fontSize: 16, fontWeight: 'bold', textAlign: 'center', marginBottom: 8 }}>
+                                    Análisis de IA
+                                </Text>
+                                {analyzing ? (
+                                    <View style={{ alignItems: 'center' }}>
+                                        <ActivityIndicator size="large" color={colors.accent} />
+                                        <Text style={{ color: colors.accent, marginTop: 8, textAlign: 'center' }}>
+                                            Analizando imagen...
+                                        </Text>
+                                    </View>
+                                ) : aiResult ? (
+                                    <View style={{ alignItems: 'center' }}>
+                                        <Icon name="alert-circle" size={24} color={colors.danger} style={{ marginBottom: 8 }} />
+                                        <Text style={{ color: colors.danger, fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>
+                                            {aiResult}
+                                        </Text>
+                                    </View>
+                                ) : null}
+                            </View>
+
                             {uploading ? (
                                 <View style={{ alignItems: 'center', marginVertical: 16 }}>
                                     <ActivityIndicator size="large" color={colors.accent} />
@@ -263,10 +380,20 @@ export default function HomeScreen() {
                                         <Text style={{ color: colors.text, fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>Cancelar</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
-                                        style={{ backgroundColor: colors.accent, borderRadius: 12, paddingVertical: 16, paddingHorizontal: 24, flex: 1, marginLeft: 8 }}
+                                        style={{ 
+                                            backgroundColor: aiResult ? colors.accent : colors.icon, 
+                                            borderRadius: 12, 
+                                            paddingVertical: 16, 
+                                            paddingHorizontal: 24, 
+                                            flex: 1, 
+                                            marginLeft: 8 
+                                        }}
                                         onPress={handleNotifyUPC}
+                                        disabled={!aiResult}
                                     >
-                                        <Text style={{ color: colors.text, fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>Notifica UPC</Text>
+                                        <Text style={{ color: colors.text, fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>
+                                            {aiResult ? 'Reportar Incidente' : 'Analizando...'}
+                                        </Text>
                                     </TouchableOpacity>
                                 </View>
                             )}
