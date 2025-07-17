@@ -27,7 +27,7 @@ type RootStackParamList = {
   [key: string]: any;
 };
 
-const HistoryScreen = () => {
+const UserScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [loading, setLoading] = useState(false);
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   },
   incidentType: { 
     fontSize: 12, 
-    color: colors.danger, 
+    color: colors.danger[500], 
     fontWeight: 'bold' 
   },
   tabBar: {
@@ -254,4 +254,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HistoryScreen;
+export default UserScreen;

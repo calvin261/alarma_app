@@ -8,17 +8,25 @@ export default function Footer() {
   const navigation = useNavigation();
   return (
     <View style={styles.tabBar}>
-      <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('Historial')}>
-        <Icon name="history" size={24} color={colors.icon} />
-        <Text style={styles.tabLabel}>Historial</Text>
+      <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('Home')}>
+        <Icon name="shield-check" size={24} color={colors.icon} />
+        <Text style={styles.tabLabel}>Monitor</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={[styles.tabItem]} onPress={() => navigation.navigate('Home')}>
-        <Icon name="shield-home-outline" size={24} color={colors.icon} />
-        <Text style={styles.tabLabel}>Monitorear</Text>
+      <TouchableOpacity style={[styles.tabItem]} onPress={() => navigation.navigate('Resumen')}>
+        <Icon name="video" size={24} color={colors.icon} />
+        <Text style={styles.tabLabel}>Resumen</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('Camaras')}>
-        <Icon name="camera-wireless-outline" size={24} color={colors.icon} />
-        <Text style={styles.tabLabel}>Camaras</Text>
+      <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('Proceso')}>
+        <Icon name="file-document-outline" size={24} color={colors.icon} />
+        <Text style={styles.tabLabel}>Proceso</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('Encontrar')}>
+        <Icon name="map" size={24} color={colors.icon} />
+        <Text style={styles.tabLabel}>Encontrar</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('User')}>
+        <Icon name="account" size={24} color={colors.icon} />
+        <Text style={styles.tabLabel}>Usuario</Text>
       </TouchableOpacity>
   
     </View>

@@ -18,8 +18,8 @@
     "android": {
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyCHXp9WpKJd21oah-1gZhqhhmEaNnwfBNo",
-        },
+          "apiKey": "AIzaSyCHXp9WpKJd21oah-1gZhqhhmEaNnwfBNo"
+        }
       },
       "googleServicesFile": "./google-services.json",
       "jsEngine": "hermes",
@@ -45,6 +45,32 @@
           "locationPermission": "Permitir que $(PRODUCT_NAME) acceda a tu ubicación para mostrar tu posición en el mapa"
         }
       ],
+     
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Show current location on map."
+        }
+      ],
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsVersion": "11.0.0"
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ],
+      [
+        "expo-video",
+        {
+          "supportsBackgroundPlayback": true,
+          "supportsPictureInPicture": true
+        }
+      ],
       [
         "expo-build-properties",
         {
@@ -55,7 +81,9 @@
             "googleMapsApiKey": "AIzaSyCHXp9WpKJd21oah-1gZhqhhmEaNnwfBNo"
           }
         }
-      ]
+      ],
+      "expo-audio",
+      "expo-video"
     ],
     "web": {
       "favicon": "./assets/favicon.png"
