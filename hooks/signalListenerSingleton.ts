@@ -14,7 +14,6 @@ export function initSignalListener(userId: string) {
 export function setSignalListenerPlayer(player: any) {
   if (!reference || !player) return;
   const onValueChange = (snapshot: any) => {
-    console.log('snapshot.val()', snapshot.val());
     player.seekTo(0);
     if (snapshot.val()?.trigger) {
       player.play();

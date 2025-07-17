@@ -109,6 +109,20 @@ export default function HomeScreen() {
         fetchLocation();
     }, []);
 
+
+    useEffect(() => {
+        const reference = database().ref(`/signals/myId`);
+        const onValueChange = (snapshot: any) => {
+            if (snapshot.val()?.trigger) {
+                setIsOn(true);
+            } else {
+                setIsOn(false);
+            }
+        };
+        reference.on('value', onValueChange);
+        return () => reference.off('value', onValueChange);
+    }, []);
+
     // Manejar respuesta a notificaciones
     // Maneja la respuesta a notificaciones push y navega al historial si corresponde
     useEffect(() => {
