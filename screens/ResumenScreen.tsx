@@ -32,68 +32,68 @@ export default function ResumenScreen() {
     } = useStreaming(cameraIpUrl);
 
     // Conditional rendering for registration form
-    if (!cameraIp) {
-        return (
-            <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>
-                    No se ha registrado ninguna IP de cámara. Regístrala aquí:
-                </Text>
-                <View style={{ width: '100%', marginTop: 20 }}>
-                    <Text style={{ color: colors.neutro, fontFamily: FontFamily.medium, marginBottom: 8 }}>
-                        IP de la cámara
-                    </Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                        <View style={{ flex: 1 }}>
-                            <TextInput
-                                style={{
-                                    backgroundColor: 'rgba(0,0,0,0.1)',
-                                    color: colors.neutro,
-                                    borderRadius: 8,
-                                    padding: 12,
-                                    fontFamily: FontFamily.medium,
-                                }}
-                                placeholder="http://192.168.1.1:8080"
-                                placeholderTextColor={colors.neutro}
-                                value={ipInput}
-                                onChangeText={setIpInput}
-                                autoCapitalize="none"
-                                keyboardType="url"
-                            />
-                        </View>
-                        <TouchableOpacity
-                            style={{
-                                backgroundColor: colors.primary,
-                                paddingVertical: 12,
-                                paddingHorizontal: 20,
-                                borderRadius: 8,
-                            }}
-                            onPress={() => {
-                                if (ipInput.trim()) {
-                                    setCameraIp(ipInput.trim());
-                                    Toast.show({
-                                        type: 'success',
-                                        text1: 'IP registrada',
-                                        text2: ipInput.trim(),
-                                        visibilityTime: 2000,
-                                    });
-                                } else {
-                                    Toast.show({
-                                        type: 'error',
-                                        text1: 'Debes ingresar una IP válida',
-                                        visibilityTime: 2000,
-                                    });
-                                }
-                            }}
-                        >
-                            <Text style={{ color: colors.neutro, fontFamily: FontFamily.bold }}>
-                                Registrar
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </View>
-        );
-    }
+    // if (!cameraIp) {
+    //     return (
+    //         <View style={styles.errorContainer}>
+    //             <Text style={styles.errorText}>
+    //                 No se ha registrado ninguna IP de cámara. Regístrala aquí:
+    //             </Text>
+    //             <View style={{ width: '100%', marginTop: 20 }}>
+    //                 <Text style={{ color: colors.neutro, fontFamily: FontFamily.medium, marginBottom: 8 }}>
+    //                     IP de la cámara
+    //                 </Text>
+    //                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+    //                     <View style={{ flex: 1 }}>
+    //                         <TextInput
+    //                             style={{
+    //                                 backgroundColor: 'rgba(0,0,0,0.1)',
+    //                                 color: colors.neutro,
+    //                                 borderRadius: 8,
+    //                                 padding: 12,
+    //                                 fontFamily: FontFamily.medium,
+    //                             }}
+    //                             placeholder="http://192.168.1.1:8080"
+    //                             placeholderTextColor={colors.neutro}
+    //                             value={ipInput}
+    //                             onChangeText={setIpInput}
+    //                             autoCapitalize="none"
+    //                             keyboardType="url"
+    //                         />
+    //                     </View>
+    //                     <TouchableOpacity
+    //                         style={{
+    //                             backgroundColor: colors.primary,
+    //                             paddingVertical: 12,
+    //                             paddingHorizontal: 20,
+    //                             borderRadius: 8,
+    //                         }}
+    //                         onPress={() => {
+    //                             if (ipInput.trim()) {
+    //                                 setCameraIp(ipInput.trim());
+    //                                 Toast.show({
+    //                                     type: 'success',
+    //                                     text1: 'IP registrada',
+    //                                     text2: ipInput.trim(),
+    //                                     visibilityTime: 2000,
+    //                                 });
+    //                             } else {
+    //                                 Toast.show({
+    //                                     type: 'error',
+    //                                     text1: 'Debes ingresar una IP válida',
+    //                                     visibilityTime: 2000,
+    //                                 });
+    //                             }
+    //                         }}
+    //                     >
+    //                         <Text style={{ color: colors.neutro, fontFamily: FontFamily.bold }}>
+    //                             Registrar
+    //                         </Text>
+    //                     </TouchableOpacity>
+    //                 </View>
+    //             </View>
+    //         </View>
+    //     );
+    // }
 
     // ...existing code...
     const handleVideoStart = () => {
