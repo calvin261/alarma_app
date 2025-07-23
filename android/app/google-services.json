@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "301905941765",
+    "project_id": "appmineria-73303",
+    "storage_bucket": "appmineria-73303.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:301905941765:android:ae6bfa20b67011aa8cd36c",
+        "android_client_info": {
+          "package_name": "com.example.app_mineria"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "301905941765-f5ru5c5vl90g1h933e8qun6p0dfdrpb1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXxQiR5AvSw9hQCCUmx9eSCFisPYH-_Ko"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "301905941765-f5ru5c5vl90g1h933e8qun6p0dfdrpb1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "301905941765-6ek2q13lv67oojrb9hdlhpvecuku9hg4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.appMineria.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:301905941765:android:d924009580d676688cd36c",
+        "android_client_info": {
+          "package_name": "com.kuntur"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "301905941765-f5ru5c5vl90g1h933e8qun6p0dfdrpb1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXxQiR5AvSw9hQCCUmx9eSCFisPYH-_Ko"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "301905941765-f5ru5c5vl90g1h933e8qun6p0dfdrpb1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "301905941765-6ek2q13lv67oojrb9hdlhpvecuku9hg4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.appMineria.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

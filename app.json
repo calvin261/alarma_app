@@ -6,24 +6,87 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/logo_face.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FFFFFF"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCHXp9WpKJd21oah-1gZhqhhmEaNnwfBNo"
+        }
+      },
+      "googleServicesFile": "./google-services.json",
+      "jsEngine": "hermes",
+      "package": "com.kuntur",
+      "permissions": [
+        "CAMERA",
+        "LOCATION",
+        "STORAGE"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
     },
+    "plugins": [
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      [
+        "expo-maps",
+        {
+          "requestLocationPermission": true,
+          "locationPermission": "Permitir que $(PRODUCT_NAME) acceda a tu ubicación para mostrar tu posición en el mapa"
+        }
+      ],
+     
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Show current location on map."
+        }
+      ],
+     
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ],
+      [
+        "expo-video",
+        {
+          "supportsBackgroundPlayback": true,
+          "supportsPictureInPicture": true
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          },
+          "android": {
+            "googleMapsApiKey": "AIzaSyCHXp9WpKJd21oah-1gZhqhhmEaNnwfBNo"
+          }
+        }
+      ],
+      "expo-audio",
+      "expo-video"
+    ],
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4aba577a-8d1f-4405-adcf-4c954daa05a2"
+      }
     }
   }
 }
